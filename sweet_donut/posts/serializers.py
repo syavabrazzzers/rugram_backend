@@ -1,6 +1,6 @@
 from abc import ABC
 
-from rest_framework.serializers import Serializer, ModelSerializer, ListSerializer, FileField, ListField, IntegerField
+from rest_framework.serializers import Serializer, ModelSerializer, ListSerializer, FileField, ListField, IntegerField, CharField
 from .models import Post, Image
 from django.contrib.auth import get_user_model
 
@@ -14,7 +14,15 @@ class PostSerializer(ModelSerializer):
     images = ImagesSerializer(many=True, read_only=True)
     class Meta:
         model = Post
-        fields = ('id', 'author', 'images')
+        fields = ('id', 'author', 'images', 'description', 'created_at', 'updated_at')
+
+
+class PostCreateSerializer(ModelSerializer):
+    file = FileField(max_length=None, allow_empty_file=False, allow_null=False, required=True)
+    # description = CharField(max_length=500)
+    class Meta:
+        model = Post
+        fields = ['file', 'description']
 
 
 class UploadSerializer(Serializer):

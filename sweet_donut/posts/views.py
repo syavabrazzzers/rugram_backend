@@ -5,9 +5,9 @@ from django.shortcuts import render
 from django.http.response import JsonResponse
 from rest_framework import status
 from rest_framework.decorators import action
-from rest_framework.parsers import FileUploadParser, FormParser, MultiPartParser
+from rest_framework.parsers import FileUploadParser, FormParser, MultiPartParser, JSONParser
 from rest_framework.views import APIView
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from . import serializers
 from .serializers import PostSerializer, UserSerializer, PostUpdateSerializer, UploadSerializer, ImagesSerializer
@@ -77,6 +77,8 @@ class FileDeleteView(APIView):
 
 
 class PostsView(APIView):
+    parser_classes = [MultiPartParser]
+    permission_classes = [IsAuthenticatedOrReadOnly]
     def get(self, request):
         donuts = Post.objects.all()
         serializer = PostSerializer(donuts, many=True)
@@ -84,24 +86,17 @@ class PostsView(APIView):
 
     @swagger_auto_schema(
         operation_description="VLADICK PIDOR HUI SOSI",
-        request_body=PostSerializer)
+        request_body=serializers.PostCreateSerializer)
     def post(self, request):
-        new_donut = PostSerializer(data=request.data)
-        User = get_user_model()
-        if new_donut.is_valid() and request.user.is_authenticated:
-            user_object = User.objects.get(id=request.data['donut_to'])
-            user_dict = {
-                'username': user_object.username,
-                'email': user_object.email,
-                'donutions_count': int(user_object.donutions_count) + 1,
-                'donutions_total': float(user_object.donutions_total) + float(request.data['amount'])
-            }
-            serializer = UserSerializer(instance=user_object, data=user_dict)
-            print(serializer.data) if serializer.is_valid() else print(serializer.errors)
-            if serializer.is_valid():
-                print('ABOBA')
-                print(serializer.data)
-                serializer.update(instance=user_object, validated_data=serializer.validated_data)
-            new_donut.save()
-            return Response(new_donut.data, status=status.HTTP_201_CREATED)
-        return Response(new_donut.errors, status=status.HTTP_400_BAD_REQUEST)
+        file = request.data.get('file')
+        print(file)
+        serializer = serializers.PostCreateSerializer(data=request.data)
+        print(serializer)
+        if serializer.is_valid():
+        # if not file:
+        #     return Response(status=status.HTTP_400_BAD_REQUEST, data={'error': 'File required'})
+            post = Post.objects.create(author=request.user, description=request.data['description'])
+            Image.objects.create(image=request.data['file'], post=post)
+            return Response(status=status.HTTP_201_CREATED)
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)

@@ -29,6 +29,7 @@ class Post(models.Model):
     id = models.AutoField(primary_key=True)
     author = models.ForeignKey(to=get_user_model(), on_delete=models.CASCADE)
     description = models.TextField(max_length=500, default=None, null=True, blank=True)
+    likes_count = models.PositiveIntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
