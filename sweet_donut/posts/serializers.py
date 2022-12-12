@@ -38,10 +38,10 @@ class DropFileSerializer(Serializer):
 
 
 class PostUpdateSerializer(ModelSerializer):
-    images = ListField(child=FileField(max_length=None, allow_empty_file=False, allow_null=False, required=True))
+    # images = ListField(child=FileField(max_length=None, allow_empty_file=False, allow_null=False, required=True))
     class Meta:
         model = Post
-        fields = ('images',)
+        fields = ['description']
 
 class UserSerializer(ModelSerializer):
     class Meta:

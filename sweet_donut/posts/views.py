@@ -28,21 +28,19 @@ class PostView(APIView):
 
     @swagger_auto_schema(
         operation_description="VLADICK PIDOR HUI SOSI",
-        request_body=PostUpdateSerializer,)
+        request_body=PostUpdateSerializer)
     def put(self, request, pk):
         post = Post.objects.get(id=pk)
-        images = Image.objects.filter(post=post)
-        print(images)
-        serializer = PostSerializer(instance=post, data=request.data)
+        serializer = PostUpdateSerializer(instance=post, data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, pk):
-        donut = Post.objects.get(id=pk)
+        post = Post.objects.get(id=pk)
         if request.user.is_authenticated:
-            donut.delete()
+            post.delete()
             return Response(status=status.HTTP_200_OK)
         return Response(status=status.HTTP_401_UNAUTHORIZED)
 
@@ -54,7 +52,6 @@ class FileUploadView(APIView):
         operation_description="VLADICK PIDOR HUI SOSI",
         request_body=UploadSerializer)
     def post(self, request, pk):
-        parser_classes = [FileUploadParser]
         post = Post.objects.get(id=pk)
         if not post:
             return Response(status=status.HTTP_404_NOT_FOUND, data={"error": "Post not found"})

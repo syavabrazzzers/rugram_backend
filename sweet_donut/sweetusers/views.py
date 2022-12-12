@@ -6,7 +6,7 @@ from django.contrib.auth import get_user_model
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from .serializers import UserRegisterSerializer, UserSerializer, UserProfileSerializer
-from .models import Profile, Subscriptions
+from .models import Profile, Subscription
 from django.contrib.auth import password_validation
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.hashers import make_password
@@ -42,16 +42,18 @@ class SubscribeView(APIView):
 
     def get(self, request, pk):
         object = User.objects.get(id=pk)
-        try_subs = Subscriptions.objects.get(object=object)
+        try_subs = Subscription.objects.filter(object=object)
         if try_subs:
             return Response(status=status.HTTP_200_OK, data={'message': 'subscribed'})
         return Response(status=status.HTTP_200_OK, data={'message': 'not subscribed'})
     def post(self, request, pk):
         object = User.objects.get(id=pk)
-        try_subs = Subscriptions.objects.get(object=object)
+        print(object)
+        try_subs = Subscription.objects.filter(object=object)
+        print(try_subs)
         if try_subs:
             return Response(status=status.HTTP_208_ALREADY_REPORTED, data={'error': 'Subscription already exists'})
-        Subscriptions.objects.create(subject=request.user, object=object)
+        Subscription.objects.create(subject=request.user, object=object)
         return Response(status=status.HTTP_201_CREATED)
 
     # @swagger_auto_schema(

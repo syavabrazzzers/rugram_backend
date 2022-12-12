@@ -42,7 +42,7 @@ class Profile(models.Model):
         return f'ID: {self.user.id}  ({self.user.username})'
 
 
-class Subscriptions(models.Model):
+class Subscription(models.Model):
     subject = models.ForeignKey(User, related_name='author_subscription', on_delete=models.CASCADE, null=True)
     object = models.ForeignKey(User, related_name='subscriptions', on_delete=models.CASCADE, null=True)
     subscribe_date = models.DateTimeField(auto_now_add=True)

@@ -12,9 +12,9 @@ class PostAdmin(admin.ModelAdmin):
     list_display = ('id', 'author')
 
 
-    @admin.display(ordering='post__images')
-    def post_images(self, obj):
-        return Image.objects.get()
+    # @admin.display(ordering='post__images')
+    # def post_images(self, obj):
+    #     return Image.objects.get()
 
 
 @admin.register(Image)
